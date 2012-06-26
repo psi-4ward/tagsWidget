@@ -1,0 +1,55 @@
+<?php $this->generate(); ?>
+<?php $id = (int)$this->Input->get('id'); ?>
+
+<h3><?php echo $this->generateLabel(); echo $this->xlabel; ?></h3>
+<?php echo $this->getErrorAsHTML();?>
+
+<div id="tagWrap<?php echo $id;?>" class="tagsWidget">
+	<div class="tagLock">
+	<?php if(is_array($this->value)): foreach($this->value as $val): ?>
+		<div class="tag"><?php echo $val; ?><span class="tagClose" id="close1" title="<?php echo $GLOBALS['TL_LANG']['widget_tags']['del']; ?>"></span></div>
+	<?php endforeach; endif; ?>
+	</div>
+	<div class="clear"></div>
+
+	<div><input type="text" name="listTags" class="tl_text" placeholder="<?php echo $GLOBALS['TL_LANG']['widget_tags']['inputPlaceholder']; ?>" onfocus="Backend.getScrollOffset();" autocomplete="off"></div>
+
+	<?php if(is_array($this->value)): foreach($this->value as $val): ?>
+	 	<input type="hidden" name="<?php echo $this->name; ?>[]" value="<?php echo $val; ?>">
+	<?php endforeach; endif; ?>
+</div>
+
+<script type="text/javascript">
+window.addEvent("domready", function() {
+	var tagify = new mooTagify(document.id("tagWrap<?php echo $id;?>"), new Request.JSON(
+	{
+		url: "system/modules/tagsWidget/ajax.php?id=<?php echo $id; ?>&fld=<?php echo $this->name; ?>&tbl="+document.id("tagWrap<?php echo $id;?>").getParent('form').getElement('input[name=FORM_SUBMIT]').get('value'),
+		method: "get"
+	}), {
+		autoSuggest: true,
+		minItemLength: 3,
+		maxItemLength: 100,
+		maxItemCount: 15,
+		caseSensitiveTagMatching: true,
+
+		onInvalidTag: function(invalidTag) {
+			alert('<?php echo $GLOBALS['TL_LANG']['widget_tags']['toShort']; ?>')
+		},
+		onLimitReached: function(rejectedTag) {
+			alert('<?php echo $GLOBALS['TL_LANG']['widget_tags']['limitReached']; ?>')
+		},
+		onTagsUpdate: function()
+		{
+			new Element('input',{'type':'hidden','name':'<?php echo $this->name; ?>[]','value':arguments[arguments.length-1],'title':'<?php echo $GLOBALS['TL_LANG']['widget_tags']['del']; ?>'})
+				.inject(this.element,'bottom');
+		},
+		onTagRemove: function(tag)
+		{
+			this.element.getElement('input[type=hidden][value='+tag+']').destroy();
+		}
+	});
+
+
+
+});
+</script>
