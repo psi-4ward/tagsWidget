@@ -21,32 +21,30 @@
 
 <script type="text/javascript">
 window.addEvent("domready", function() {
-	var tagify = new mooTagify(document.id("tagWrap<?php echo $id;?>"), new Request.JSON(
-	{
-		url: "system/modules/tagsWidget/ajax.php?id=<?php echo $id; ?>&fld=<?php echo $this->name; ?>&tbl="+document.id("tagWrap<?php echo $id;?>").getParent('form').getElement('input[name=FORM_SUBMIT]').get('value'),
-		method: "get"
-	}), {
-		autoSuggest: true,
-		minItemLength: 3,
-		maxItemLength: 100,
-		maxItemCount: 15,
-		caseSensitiveTagMatching: true,
+	var tagify = new mooTagify(document.id("tagWrap<?php echo $id;?>"),
+		"system/modules/tagsWidget/ajax.php?id=<?php echo $id; ?>&fld=<?php echo $this->name; ?>&tbl="+document.id("tagWrap<?php echo $id;?>").getParent('form').getElement('input[name=FORM_SUBMIT]').get('value'),
+		{
+			autoSuggest: true,
+			minItemLength: 3,
+			maxItemLength: 100,
+			maxItemCount: 15,
+			caseSensitiveTagMatching: true,
 
-		onInvalidTag: function(invalidTag) {
-			alert('<?php echo $GLOBALS['TL_LANG']['widget_tags']['toShort']; ?>')
-		},
-		onLimitReached: function(rejectedTag) {
-			alert('<?php echo $GLOBALS['TL_LANG']['widget_tags']['limitReached']; ?>')
-		},
-		onTagsUpdate: function()
-		{
-			new Element('input',{'type':'hidden','name':'<?php echo $this->name; ?>[]','value':arguments[arguments.length-1],'title':'<?php echo $GLOBALS['TL_LANG']['widget_tags']['del']; ?>'})
-				.inject(this.element,'bottom');
-		},
-		onTagRemove: function(tag)
-		{
-			this.element.getElement('input[type=hidden][value='+tag+']').destroy();
-		}
+			onInvalidTag: function(invalidTag) {
+				alert('<?php echo $GLOBALS['TL_LANG']['widget_tags']['toShort']; ?>')
+			},
+			onLimitReached: function(rejectedTag) {
+				alert('<?php echo $GLOBALS['TL_LANG']['widget_tags']['limitReached']; ?>')
+			},
+			onTagsUpdate: function()
+			{
+				new Element('input',{'type':'hidden','name':'<?php echo $this->name; ?>[]','value':arguments[arguments.length-1],'title':'<?php echo $GLOBALS['TL_LANG']['widget_tags']['del']; ?>'})
+					.inject(this.element,'bottom');
+			},
+			onTagRemove: function(tag)
+			{
+				this.element.getElement('input[type=hidden][value='+tag+']').destroy();
+			}
 	});
 
 

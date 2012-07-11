@@ -24,7 +24,7 @@ provides: mooTagify
 
 ...
 */
-!function() {
+// !function() {
 
 Array.implement({
 
@@ -42,7 +42,6 @@ var autoSuggest = new Class({
 
     options: {
         width: 233,
-        requestInstance: null,
         minChars: 2,
         wrapperZen: 'div.autocompleteWrapper',              // popup wrapper class
         wrapperShadow: 'boxShadow',                         // extra class applied to wrapper, like one with box-shadow
@@ -54,41 +53,46 @@ var autoSuggest = new Class({
         ajaxProperty: 'prefix'                              // it will pass on the typed value as prefix=NNNn
     },
 
-    initialize: function(input, request, options) {
+
+    initialize: function(input, requestUrl, options)
+	{
         this.setOptions(options)
 
-        this.element = document.id(input)
-        if (!this.element)
-            return
+        this.element = document.id(input);
+        if (!this.element) return;
 
-        this.request = request
-        this.buildList()
-        this.attachEvents()
-        this.index = -1
-        this.fireEvent('ready')
+        this.requestUrl = requestUrl;
+        this.buildList();
+        this.attachEvents();
+        this.index = -1;
+        this.fireEvent('ready');
     },
 
-    buildList: function() {
-        var visible = this.element.isVisible(),
-            size
 
-        if (!visible) {
+    buildList: function()
+	{
+        var visible = this.element.isVisible();
+        var size;
+
+        if (!visible)
+		{
             var clone = this.element.clone().setStyles({
                 opacity: .01,
                 position: 'absolute',
                 top: -1000
-            }).inject(document.body).show()
+            }).inject(document.body).show();
 
-            size = clone.getSize()
-            clone.destroy()
+            size = clone.getSize();
+            clone.destroy();
         }
-        else {
-            size = this.element.getSize()
+        else
+		{
+            size = this.element.getSize();
         }
 
-        var width = this.options.width || size.x - 2,
-            height = size.y,
-            self = this
+        var width = this.options.width || size.x - 2;
+        var height = size.y;
+        var self = this;
 
         this.wrapper = new Element(this.options.wrapperZen, {
             styles: {
@@ -96,233 +100,264 @@ var autoSuggest = new Class({
                 marginTop: height
             },
             events: {
-                mouseenter: function() {
-                    self.over = true
+                mouseenter: function()
+				{
+                    self.over = true;
                 },
-                mouseleave: function() {
-                    self.over = false
+                mouseleave: function()
+				{
+                    self.over = false;
                 },
-                outerClick: function(e) {
-                    if (!self.focused)
-                        self.hide()
+                outerClick: function(e)
+				{
+                    if (!self.focused) self.hide();
                 },
-                'click:relay(div)': function(e) {
-                    self.select(this.retrieve('index'))
+                'click:relay(div)': function(e)
+				{
+                    self.select(this.retrieve('index'));
                 }
             }
-        }).inject(this.element, 'before')
+        }).inject(this.element, 'before');
 
-        this.wrapper.addClass(this.options.wrapperShadow)
-        this.scrollFx = new Fx.Scroll(this.wrapper, {
+        this.wrapper.addClass(this.options.wrapperShadow);
+        this.scrollFx = new Fx.Scroll(this.wrapper,
+		{
             duration: 200
-        })
+        });
     },
 
-    attachEvents: function() {
+
+    attachEvents: function()
+	{
         this.element.addEvents({
             keydown: this.handleKey.bind(this),
             keyup: this.handleText.bind(this),
             focus: this.handleText.bind(this),
             blur: this.blur.bind(this)
-        }).setStyle('width', this.options.width - 3)
+        }).setStyle('width', this.options.width - 3);
 
-        var self = this
+        var self = this;
 
-        this.request.setOptions({
+        this.request =  new Request.JSON(
+		{
+			url: this.requestUrl,
+			method: "get",
             timeout: 30000,
             link: 'cancel',
-            onSuccess: function(data) {
+            onSuccess: function(data)
+			{
 				if(data && data.length)
 				{
 					// filter already set tags // by PsiTrax
 					var choosenTags = self.options.mooTagify.getTags();
-					data = Array.filter(data, function(option){
+					data = Array.filter(data, function(option)
+					{
 						return !choosenTags.contains(option);
 					});
 				}
 
-                if (data && data.length) {
-                    self.show()
-                    self.addOptions(data)
+                if (data && data.length)
+				{
+                    self.show();
+                    self.addOptions(data);
                 }
-                else {
-                    self.clearOptions()
-                    self.hide()
+                else
+				{
+                    self.clearOptions();
+                    self.hide();
                 }
-
             }
-        })
-
+        });
     },
 
-    addOptions: function(answers) {
-        var self = this
+
+    addOptions: function(answers)
+	{
+        var self = this;
 
 
-        this.wrapper.empty()
-        this.answers = answers || []
-        this.answersOptions = new Elements()
+        this.wrapper.empty();
+        this.answers = answers || [];
+        this.answersOptions = new Elements();
 
-        var val = {
-            value: this.element.get('value').clean()
-        }
+        var val = {value: this.element.get('value').clean()};
 
-        this.answers.each(function(option, index) {
-            	self.addOption(option, val, index)
+        this.answers.each(function(option, index)
+		{
+            	self.addOption(option, val, index);
         })
     },
 
-    addOption: function(option, val, index) {
-        var matches = option.match(val.value, 'i'),
-            value = option,
-            self = this
 
-        if (matches && matches.length) {
-            matches.each(function(substring) {
-                val.value = substring
-                value = option.replace(substring, self.options.highlightTemplate.substitute(val), 'ig')
-            })
+    addOption: function(option, val, index)
+	{
+        var matches = option.match(val.value, 'i');
+        var value = option;
+        var self = this;
+
+        if (matches && matches.length)
+		{
+            matches.each(function(substring)
+			{
+                val.value = substring;
+                value = option.replace(substring, self.options.highlightTemplate.substitute(val), 'ig');
+            });
         }
 
-        var opt = new Element(this.options.optionZen, {
+        var opt = new Element(this.options.optionZen,
+		{
             html: value
-        }).inject(this.wrapper).store('index', index)
+        }).inject(this.wrapper).store('index', index);
 
-        index === this.index && opt.addClass(this.options.optionClassSelected)
+        index === this.index && opt.addClass(this.options.optionClassSelected);
 
-        this.answersOptions.push(opt)
+        this.answersOptions.push(opt);
 
-        if (this.options.maxHeight) { // if greater than 0 care about this
-            this.wrapper.setStyle('height', 'auto')
-            var height = this.wrapper.getSize().y
+        if (this.options.maxHeight) // if greater than 0 care about this
+		{
+            this.wrapper.setStyle('height', 'auto');
+            var height = this.wrapper.getSize().y;
 
-            if (height >= this.options.maxHeight) {
-                this.wrapper.setStyle('height', this.options.maxHeight)
+            if (height >= this.options.maxHeight)
+			{
+                this.wrapper.setStyle('height', this.options.maxHeight);
             }
 
         }
     },
 
-    handleKey: function(e) {
-        switch(e.code) {
+
+    handleKey: function(e)
+	{
+        switch(e.code)
+		{
             case 8:
                 // backspace.
-                var len = e.target.get('value').clean()
-                len.length || this.fireEvent('delete')
-            break
+                var len = e.target.get('value').clean();
+                len.length || this.fireEvent('delete');
+            break;
+
             case 40:
-                e && e.stop()
-                if (!this.answersOptions)
-                    break
+                e && e.stop();
+                if (!this.answersOptions) break;
 
-                if (this.answersOptions[this.index])
-                    this.answersOptions[this.index].addClass(this.options.optionClassSelected)
+                if (this.answersOptions[this.index]) this.answersOptions[this.index].addClass(this.options.optionClassSelected);
 
-                if (this.index < this.answersOptions.length - 1) {
-                    this.answersOptions.removeClass(this.options.optionClassSelected)
-                    this.index++
-                    this.answersOptions[this.index].addClass(this.options.optionClassSelected)
+                if (this.index < this.answersOptions.length - 1)
+				{
+                    this.answersOptions.removeClass(this.options.optionClassSelected);
+                    this.index++;
+                    this.answersOptions[this.index].addClass(this.options.optionClassSelected);
                 }
-                else {
-                    this.answersOptions.removeClass(this.options.optionClassSelected)
-                    this.index = 0
-                    if (!this.answersOptions[this.index])
-                        break
+                else
+				{
+                    this.answersOptions.removeClass(this.options.optionClassSelected);
+                    this.index = 0;
+                    if (!this.answersOptions[this.index]) break;
 
-                    this.answersOptions[this.index].addClass(this.options.optionClassSelected)
+                    this.answersOptions[this.index].addClass(this.options.optionClassSelected);
                 }
-                this.scrollFx.toElement(this.answersOptions[this.index])
-                this.fireEvent('down')
-                return
-            break
+                this.scrollFx.toElement(this.answersOptions[this.index]);
+                this.fireEvent('down');
+                return;
+            break;
+
             case 38:
-                e && e.stop()
-                if (!this.answersOptions)
-                    break
+                e && e.stop();
+                if (!this.answersOptions) break;
 
-                if (this.answersOptions[this.index])
-                    this.answersOptions[this.index].addClass(this.options.optionClassSelected)
+                if (this.answersOptions[this.index]) this.answersOptions[this.index].addClass(this.options.optionClassSelected);
 
-                if (this.index > 0) {
-                    this.answersOptions.removeClass(this.options.optionClassSelected)
-                    this.index--
-                    this.answersOptions[this.index].addClass(this.options.optionClassSelected)
+                if (this.index > 0)
+				{
+                    this.answersOptions.removeClass(this.options.optionClassSelected);
+                    this.index--;
+                    this.answersOptions[this.index].addClass(this.options.optionClassSelected);
                 }
-                else {
-                    this.answersOptions.removeClass(this.options.optionClassSelected)
-                    this.index = this.answersOptions.length - 1
-                    if (!this.answersOptions[this.index])
-                        break
+                else
+				{
+                    this.answersOptions.removeClass(this.options.optionClassSelected);
+                    this.index = this.answersOptions.length - 1;
+                    if (!this.answersOptions[this.index]) break;
 
-                    this.answersOptions[this.index].addClass(this.options.optionClassSelected)
+                    this.answersOptions[this.index].addClass(this.options.optionClassSelected);
                 }
 
-                this.scrollFx.toElement(this.answersOptions[this.index])
-                this.fireEvent('up')
-                return
-            break
+                this.scrollFx.toElement(this.answersOptions[this.index]);
+                this.fireEvent('up');
+                return;
+            break;
+
             case 13:
-                e && e.preventDefault && e.preventDefault()
+                e && e.preventDefault && e.preventDefault();
 
-                if (this.index !== -1)
-                    this.select(this.index)
-                else {
-                   this.element.blur()
-                }
-            break
+                if (this.index !== -1) this.select(this.index);
+                else this.element.blur();
+            break;
         }
 
     },
 
-    handleText: function(e) {
+    handleText: function(e)
+	{
         // it's where the ajax look ahead happens...
-        if (e && e.code) {
-            if ([38,40].contains(e.code))
-                return
+        if (e && e.code)
+		{
+            if ([38,40].contains(e.code)) return;
         }
 
-        var val = this.element.get('value')
-        if (val.length <= this.options.minChars) {
-            this.hide()
-            return
+        var val = this.element.get('value');
+        if (val.length <= this.options.minChars)
+		{
+            this.hide();
+            return;
         }
 
-        var obj = {}
-        obj[this.options.ajaxProperty] = val
-        this.request.get(obj)
+        var obj = {};
+        obj[this.options.ajaxProperty] = val;
+        this.request.get(obj);
     },
 
-    clearOptions: function() {
-        this.answers = []
-        this.answersOptions = new Elements()
-        this.wrapper.empty()
-        this.index = -1
-        this.hide()
+
+    clearOptions: function()
+	{
+        this.answers = [];
+        this.answersOptions = new Elements();
+        this.wrapper.empty();
+        this.index = -1;
+        this.hide();
     },
 
-    select: function(index) {
-        this.element.set('value', this.answers[index]).blur()
-        this.clearOptions()
-        this.fireEvent('select', index)
+
+    select: function(index)
+	{
+        this.element.set('value', this.answers[index]).blur();
+        this.clearOptions();
+        this.fireEvent('select', index);
     },
 
-    hide: function() {
-        this.wrapper.setStyle('display', 'none')
+
+    hide: function()
+	{
+        this.wrapper.setStyle('display', 'none');
     },
 
-    show: function() {
-        this.wrapper.setStyle('display', 'block')
-        this.focused = true
+
+    show: function()
+	{
+        this.wrapper.setStyle('display', 'block');
+        this.focused = true;
     },
 
-    blur: function() {
-        this.element.set('value', this.element.get('value').clean())
-        this.focused = false
-        if (!this.over)
-            this.hide()
+
+    blur: function()
+	{
+        this.element.set('value', this.element.get('value').clean());
+        this.focused = false;
+        if (!this.over) this.hide();
     }
 
-})
+});
 
 
 var mooTagify = this.mooTagify = new Class({
@@ -347,156 +382,186 @@ var mooTagify = this.mooTagify = new Class({
         caseSensitiveTagMatching: false /* set to true, to keep case as entered */
     },
 
-    initialize: function(element, request, options) {
-        this.element = document.id(element)
-        if (!this.element)
-            return
 
-        this.request = request
-        this.setOptions(options)
+    initialize: function(element, requestUrl, options)
+	{
+        this.element = document.id(element);
+        if (!this.element) return;
 
-        this.listTags = this.element.getElement('input,textarea')
-        if (!this.listTags)
-            return
+        this.requestUrl = requestUrl;
+        this.setOptions(options);
 
-        this.attachEvents()
+        this.listTags = this.element.getElement('input,textarea');
+        if (!this.listTags) return;
+
+        this.attachEvents();
     },
 
-    attachEvents: function() {
-        var self = this
-        if (this.options.autoSuggest && this.request) {
-            this.autoSuggester = new autoSuggest(this.element.getElement('input'), this.request, {
-                onDelete: function() {
-                    var last = self.element.getElements(self.options.tagEls).getLast()
+
+    attachEvents: function()
+	{
+        var self = this;
+        if (this.options.autoSuggest && this.requestUrl)
+		{
+            this.autoSuggester = new autoSuggest(this.element.getElement('input'), this.requestUrl,
+			{
+                onDelete: function()
+				{
+                    var last = self.element.getElements(self.options.tagEls).getLast();
                     last && self.element.fireEvent('click', {
                         target: last.getElement('span.tagClose')
-                    })
+                    });
                 },
 				mooTagify: this
-            })
+            });
         }
 
-        this.clicked = false
+        this.clicked = false;
 
         var eventObject = {
             'blur:relay(input)': this.extractTags.bind(this),
             'click:relay(span.tagClose)': this.removeTag.bind(this),
-            'mousedown': function() {
+            'mousedown': function()
+			{
                 self.clicked = true
             },
-            'mouseup': function() {
+            'mouseup': function()
+			{
                 self.clicked = false
             },
-            'keydown:relay(input)': function(e, el) {
-                if (e.key == 'enter') {
-                    if (self.options.addOnBlur) {
-                        el.blur()
+            'keydown:relay(input)': function(e, el)
+			{
+                if (e.key == 'enter')
+				{
+                    if (self.options.addOnBlur)
+					{
+                        el.blur();
                     }
-                    else {
-                        self.extractTags() && e.stop()
+                    else
+					{
+                        self.extractTags() && e.stop();
                     }
                 }
             }
-        }
+        };
 
-        this.options.addOnBlur || (delete eventObject['blur:relay(input)'])
-        this.element.addEvents(eventObject)
-        this.fireEvent('ready')
+        this.options.addOnBlur || (delete eventObject['blur:relay(input)']);
+        this.element.addEvents(eventObject);
+        this.fireEvent('ready');
     },
 
-    extractTags: function() {
-        var self = this,
-            check = function() {
-                if (self.clicked)
-                    return false
 
-                clearInterval(this.timer)
+    extractTags: function()
+	{
+        var self = this;
+        var check = function()
+		{
+			if (self.clicked) return false;
 
-                var newTags = self.listTags.get('value').clean().stripScripts()
-                self.options.caseSensitiveTagMatching || (newTags = newTags.toLowerCase())
+			clearInterval(this.timer);
 
-                if (newTags.length) {
-                    self.processTags(newTags)
-                    self.options.persist && self.listTags.focus.delay(10, self.listTags)
-                }
-                self.options.autoSuggest && self.autoSuggester.hide()
-                return true
-            }
+			var newTags = self.listTags.get('value').clean().stripScripts();
+			self.options.caseSensitiveTagMatching || (newTags = newTags.toLowerCase());
 
-        clearInterval(this.timer)
+			if (newTags.length)
+			{
+				self.processTags(newTags);
+				self.options.persist && self.listTags.focus.delay(10, self.listTags);
+			}
+			self.options.autoSuggest && self.autoSuggester.hide();
+			return true;
+		};
 
-        check() || (this.timer = check.periodical(200))
+        clearInterval(this.timer);
 
-        return this
+        check() || (this.timer = check.periodical(200));
+
+        return this;
     },
 
-    processTags: function(tags) {
+
+    processTags: function(tags)
+	{
         // called when blurred tags entry, rebuilds hash tags preview
-        clearInterval(this.timer)
-        var tagsArray = tags.split(',').map(function(el) {
-            el = el.trim()
-            return el
-        }).unique()
+        clearInterval(this.timer);
 
-        var target = this.element.getFirst()
+        var tagsArray = tags.split(',').map(function(el)
+		{
+            el = el.trim();
+            return el;
+        }).unique();
 
-        if (tagsArray.length) {
-            this.listTags.set('value', '')
-            var orig = this.getTags() || []
-            tagsArray = orig.append(tagsArray).unique()
+        var target = this.element.getFirst();
+
+        if (tagsArray.length)
+		{
+            this.listTags.set('value', '');
+            var orig = this.getTags() || [];
+            tagsArray = orig.append(tagsArray).unique();
 
             /* remove tags that only differ in case */
-            var tempArray = []
-            tagsArray.each(function(tag) {
-                var found = tempArray.some(function(item) {
-                    return item.toLowerCase() == tag.toLowerCase()
-                })
-                if (!found) {
-                    tempArray.push(tag)
+            var tempArray = [];
+            tagsArray.each(function(tag)
+			{
+                var found = tempArray.some(function(item)
+				{
+                    return item.toLowerCase() == tag.toLowerCase();
+                });
+                if (!found)
+				{
+                    tempArray.push(tag);
                 }
-            })
-            tagsArray = tempArray
+            });
+            tagsArray = tempArray;
 
-            target.empty()
+            target.empty();
             var done = 0, added = [];
-            Array.each(tagsArray, function(el) {
-                this.options.caseSensitiveTagMatching || (el = el.toLowerCase())
+            Array.each(tagsArray, function(el)
+			{
+                this.options.caseSensitiveTagMatching || (el = el.toLowerCase());
 
-                if (done >= this.options.maxItemCount) {
-                    this.fireEvent('limitReached', el)
-                    return
+                if (done >= this.options.maxItemCount)
+				{
+                    this.fireEvent('limitReached', el);
+                    return;
                 }
 
-                if (el.length >= this.options.minItemLength && el.length < this.options.maxItemLength) {
-                    new Element([this.options.tagEls, '[html=', el, '<span class="tagClose"></span>]'].join('')).inject(target)
-                    done++
-                    added.push(el)
+                if (el.length >= this.options.minItemLength && el.length < this.options.maxItemLength)
+				{
+                    new Element([this.options.tagEls, '[html=', el, '<span class="tagClose"></span>]'].join('')).inject(target);
+                    done++;
+                    added.push(el);
                 }
-                else {
-                    this.fireEvent('invalidTag', el)
+                else
+				{
+                    this.fireEvent('invalidTag', el);
                 }
-            }, this)
-            this.fireEvent('tagsUpdate', added)
+            }, this);
+            this.fireEvent('tagsUpdate', added);
         }
     },
 
-    removeTag: function(e) {
-        var tag = e.target.getParent(),
-            tagText = tag.get('text')
 
-        this.options.caseSensitiveTagMatching || (tagText = tagText.toLowerCase())
+    removeTag: function(e)
+	{
+        var tag = e.target.getParent();
+        var tagText = tag.get('text');
 
-        tag.destroy()
-        this.fireEvent('tagRemove', tagText)
-        clearTimeout(this.timer)
-        this.options.persist && this.listTags.focus.delay(10, this.listTags)
+        this.options.caseSensitiveTagMatching || (tagText = tagText.toLowerCase());
+
+        tag.destroy();
+        this.fireEvent('tagRemove', tagText);
+        clearTimeout(this.timer);
+        this.options.persist && this.listTags.focus.delay(10, this.listTags);
     },
 
-    getTags: function() {
-        // return an array of entered tags.
-        var els = this.element.getElements(this.options.tagEls)
-        return (els.length) ? els.get('text') : []
-    }
-})
 
-}()
+    getTags: function()
+	{
+        // return an array of entered tags.
+        var els = this.element.getElements(this.options.tagEls);
+        return (els.length) ? els.get('text') : [];
+    }
+});
+
+// }()
