@@ -465,8 +465,16 @@ var mooTagify = this.mooTagify = new Class({
 
 			if (newTags.length)
 			{
+
 				self.processTags(newTags);
-				self.options.persist && self.listTags.focus.delay(10, self.listTags);
+
+				if(self.options.persist)
+				{
+					(function(){
+						self.listTags.focus();
+					}).delay(10,self.listTags);
+				}
+
 			}
 			self.options.autoSuggest && self.autoSuggester.hide();
 			return true;
