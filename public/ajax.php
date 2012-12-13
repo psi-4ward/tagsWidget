@@ -1,12 +1,13 @@
 <?php
+
 /**
 * Initialize the system
 */
 define('TL_MODE', 'BE');
-define('BYPASS_TOKEN_CHECK',true);
-require_once('../../initialize.php');
+require_once('../../../initialize.php');
 
-class TagsWidgetResponder extends Controller
+
+class TagsWidgetResponder extends \Controller
 {
 	public function __construct()
 	{

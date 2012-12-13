@@ -1,4 +1,5 @@
-<?php if(!defined('TL_ROOT')) {die('You cannot access this file directly!');}
+<?php
+
 
 /**
  * Tags Widget for Contao
@@ -10,7 +11,7 @@
  * @licence LGPL
  */
 
-class TagsWidget extends Widget
+class TagsWidget extends \Widget
 {
 
 	/**

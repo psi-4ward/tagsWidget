@@ -22,7 +22,7 @@
 <script type="text/javascript">
 window.addEvent("domready", function() {
 	var tagify = new mooTagify(document.id("tagWrap<?php echo $id;?>"),
-		"system/modules/tagsWidget/ajax.php?id=<?php echo $id; ?>&fld=<?php echo $this->name; ?>&tbl="+document.id("tagWrap<?php echo $id;?>").getParent('form').getElement('input[name=FORM_SUBMIT]').get('value'),
+		"system/modules/tagsWidget/public/ajax.php?id=<?php echo $id; ?>&fld=<?php echo $this->name; ?>&tbl="+document.id("tagWrap<?php echo $id;?>").getParent('form').getElement('input[name=FORM_SUBMIT]').get('value'),
 		{
 			autoSuggest: true,
 			minItemLength: 3,
