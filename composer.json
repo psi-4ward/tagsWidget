@@ -28,6 +28,6 @@
                         "symlinks": {
                                 "contao": "system/modules/tagsWidget"
                         }
-                },
+                }
         }
 } 
