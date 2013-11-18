@@ -1,0 +1,33 @@
+{
+        "name":"psi/tagsWidget",
+        "description":"Contao Widget for managing Tags",
+        "keywords":["tags", "widget"],
+        "type":"contao-module",
+        "license":"LGPL-3.0+",
+        "authors":[
+                {
+                        "name":"Christoph Wiechert",
+                        "email":"wio@psitrax.de.de",
+                        "homepage":"http://4wardmedia.de",
+                        "role":"Developer"
+                }
+        ],
+        "support":{
+                "email":"wio@psitrax.de.de",
+                "issues":"https://github.com/psi-4ward/tagsWidget/issues?direction=desc&sort=created&state=open",
+                "forum":"https://community.contao.org/de/forumdisplay.php?110-4ward",
+                "irc":"irc://irc.freenode.org/contao.de",
+                "source":"https://github.com/psi-4ward/tagsWidget"
+        },
+        "require":{
+                "php":">=5.3",
+                "contao/core": ">=3.1,<3.3",
+        },
+        "extra": {
+                "contao": {
+                        "symlinks": {
+                                "contao": "system/modules/tagsWidget"
+                        }
+                },
+        }
+} 
