@@ -26,7 +26,7 @@
         "extra": {
                 "contao": {
                         "symlinks": {
-                                "contao": "system/modules/tagsWidget"
+                                ".": "system/modules/tagsWidget"
                         }
                 }
         }
