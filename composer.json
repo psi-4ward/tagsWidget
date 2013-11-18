@@ -1,5 +1,5 @@
 {
-        "name":"psi/tagsWidget",
+        "name":"psi/tags-widget",
         "description":"Contao Widget for managing Tags",
         "keywords":["tags", "widget"],
         "type":"contao-module",
