@@ -3,8 +3,21 @@
 /**
 * Initialize the system
 */
+$dir = __DIR__;
+
+while($dir != '.' && $dir != '/' && !is_file($dir.'/system/initialize.php'))
+{
+	$dir = dirname($dir);
+}
+
+if(!is_file($dir.'/system/initialize.php'))
+{
+	echo 'Could not find initialize.php!';
+	exit(1);
+}
+
 define('TL_MODE', 'BE');
-require_once('../../../initialize.php');
+require($dir.'/system/initialize.php');
 
 
 class TagsWidgetResponder extends \Controller
