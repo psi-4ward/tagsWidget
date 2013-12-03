@@ -22,9 +22,15 @@ require($dir.'/system/initialize.php');
 
 class TagsWidgetResponder extends \Controller
 {
+
 	public function __construct()
 	{
+		$this->import('BackendUser', 'User');
 		parent::__construct();
+
+		$this->User->authenticate();
+		System::loadLanguageFile('default');
+
 		$this->import('Database');
 		
 		// little validation
@@ -38,7 +44,7 @@ class TagsWidgetResponder extends \Controller
 		$dca = $GLOBALS['TL_DCA'][$this->tbl]['fields'][$this->fld];
 
 		// let the Controller::prepareForWidget calc the options
-		$temp = $this->prepareForWidget($dca, $this->fld, '', null, $this->tbl);
+		$temp = \Widget::getAttributesFromDca($dca, $this->fld, '', null, $this->tbl);
 
 		// reformat options for Autocompleter-JS and unique values
 		$arrVals = array();
@@ -50,7 +56,7 @@ class TagsWidgetResponder extends \Controller
 
 		// filter the array to return only matching elements
 		$search = $this->Input->get('prefix');
-		$arrRet = array_filter($arrVals,function($val) use($search){
+		$arrRet = array_filter($arrVals, function($val) use($search) {
 			return strripos($val, $search) !== false;
 		});
 		
