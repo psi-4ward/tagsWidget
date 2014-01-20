@@ -38,8 +38,10 @@ window.addEvent("domready", function() {
 			},
 			onTagsUpdate: function()
 			{
-				new Element('input',{'type':'hidden','name':'<?php echo $this->name; ?>[]','value':arguments[arguments.length-1],'title':'<?php echo $GLOBALS['TL_LANG']['widget_tags']['del']; ?>'})
-					.inject(this.element,'bottom');
+				for(var i=0; i<arguments.length; i++) {
+					new Element('input',{'type':'hidden','name':'<?php echo $this->name; ?>[]','value': arguments[i]})
+						.inject(this.element,'bottom');
+				}
 			},
 			onTagRemove: function(tag)
 			{
