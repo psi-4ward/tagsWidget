@@ -39,6 +39,7 @@ window.addEvent("domready", function() {
 			onTagsUpdate: function()
 			{
 				for(var i=0; i<arguments.length; i++) {
+					if(this.element.getElement('input[type=hidden][value='+arguments[i]+']')) continue;
 					new Element('input',{'type':'hidden','name':'<?php echo $this->name; ?>[]','value': arguments[i]})
 						.inject(this.element,'bottom');
 				}
