@@ -3,7 +3,7 @@
   "description": "Contao Widget for managing Tags",
   "keywords": ["tags", "widget"],
   "type": "contao-module",
-  "license": "LGPL-3.0+",
+  "license": "LGPL-3.0-or-later",
   "authors": [
     {
       "name": "Christoph Wiechert",
@@ -21,13 +21,11 @@
   },
   "require": {
     "php": ">=5.3",
-    "contao/core": ">=3.1,<4"
+    "contao/core-bundle": "^3.2.1 || ^4.4",
+    "contao-community-alliance/composer-plugin": "^2.4 || ^3.0",
   },
   "replace": {
     "contao-legacy/tagswidget": "self.version"
-  },
-  "conflict": {
-    "contao/core": "3.0.*"
   },
   "extra": {
     "contao": {
